@@ -1,0 +1,336 @@
+/* ========================================
+   SETUP SCREEN
+   전시회 설정 화면
+======================================== */
+
+.setup {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* 헤더 */
+.setup-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border-light);
+  background: var(--surface);
+}
+.setup-header__logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.setup-header__seal {
+  width: 36px;
+  height: 36px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--heading);
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.setup-header__title {
+  font-family: var(--heading);
+  font-size: 17px;
+  color: var(--text-h);
+  letter-spacing: 0.5px;
+}
+
+/* 메인 레이아웃 — 2단 */
+.setup-main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 0;
+  overflow: hidden;
+}
+
+.setup-info {
+  padding: 28px 24px;
+  border-right: 1px solid var(--border-light);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.setup-photos {
+  padding: 28px 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* 섹션 타이틀 */
+.setup-section-title {
+  font-family: var(--heading);
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--text-h);
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+.setup-section-title--sm {
+  font-size: 13px;
+}
+
+/* 필드 */
+.setup-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.setup-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+.setup-input,
+.setup-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-size: 14px;
+  color: var(--text-h);
+  font-family: var(--sans);
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+  resize: vertical;
+}
+.setup-input:focus,
+.setup-textarea:focus {
+  border-color: var(--primary);
+}
+.setup-textarea {
+  min-height: 80px;
+}
+
+/* 작품 편집 패널 */
+.setup-artwork-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 4px;
+  border-top: 1px solid var(--border-light);
+}
+.setup-artwork-preview {
+  width: 100%;
+  max-height: 180px;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  background: var(--surface-soft);
+}
+
+/* 사진 헤더 */
+.setup-photos-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.setup-photos-count {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* 드롭존 */
+.setup-dropzone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-md);
+  padding: 32px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  text-align: center;
+}
+.setup-dropzone:hover,
+.setup-dropzone--over {
+  border-color: var(--primary);
+  background: rgba(118, 86, 62, 0.04);
+}
+.setup-dropzone__icon {
+  font-size: 28px;
+}
+.setup-dropzone__text {
+  font-size: 14px;
+  color: var(--text-h);
+  margin: 0;
+}
+.setup-dropzone__hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* 사진 그리드 */
+.setup-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 10px;
+}
+.setup-grid__item {
+  position: relative;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  cursor: pointer;
+  aspect-ratio: 3/4;
+  transition: border-color 0.15s;
+}
+.setup-grid__item:hover {
+  border-color: var(--primary);
+}
+.setup-grid__item--selected {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(118, 86, 62, 0.2);
+}
+.setup-grid__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.setup-grid__num {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  background: rgba(41, 39, 36, 0.7);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.setup-grid__actions {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  background: rgba(41, 39, 36, 0.7);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.setup-grid__item:hover .setup-grid__actions {
+  opacity: 1;
+}
+.setup-grid__btn {
+  flex: 1;
+  border: none;
+  background: none;
+  color: #fff;
+  font-size: 12px;
+  padding: 4px 0;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.setup-grid__btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.15);
+}
+.setup-grid__btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+.setup-grid__btn--del {
+  color: #ff8080;
+}
+
+/* 하단 푸터 */
+.setup-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border-light);
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+}
+.setup-footer__hint {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+  flex: 1;
+}
+.setup-submit-btn {
+  padding: 12px 28px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.setup-submit-btn:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+.setup-submit-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── 모바일: 세로 1단 ── */
+@media (max-width: 768px) {
+  .setup-main {
+    grid-template-columns: 1fr;
+    overflow: visible;
+  }
+
+  .setup-info {
+    border-right: none;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .setup-artwork-preview {
+    max-height: 140px;
+  }
+
+  .setup-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
+
+  .setup-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .setup-submit-btn {
+    width: 100%;
+    padding: 15px;
+    font-size: 16px;
+    text-align: center;
+  }
+
+  .setup-input,
+  .setup-textarea {
+    font-size: 16px; /* iOS 자동 확대 방지 */
+  }
+}

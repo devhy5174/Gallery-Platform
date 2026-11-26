@@ -1,0 +1,826 @@
+/* ========================================
+   GALLERY 3D
+   캔버스 컨테이너 + HUD 오버레이 스타일
+======================================== */
+
+.gallery-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--wall);
+  cursor: crosshair;
+}
+
+/* ========================================
+   클릭 유도 오버레이 (포인터 락 전)
+======================================== */
+
+.gallery-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(247, 243, 235, 0.72);
+  backdrop-filter: blur(4px);
+  z-index: 20;
+}
+
+.gallery-overlay__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 40px 48px;
+  background: var(--surface);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+  max-width: 360px;
+}
+
+.gallery-overlay__icon {
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+
+.gallery-overlay__title {
+  font-family: var(--heading);
+  font-size: 20px;
+  color: var(--text-h);
+  font-weight: 400;
+  letter-spacing: 1px;
+  margin: 0;
+}
+
+.gallery-overlay__hint {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.8;
+}
+
+.gallery-overlay__hint strong {
+  color: var(--text-h);
+  font-weight: 600;
+}
+
+.gallery-overlay__exit {
+  margin-top: 8px;
+  font-size: 13px;
+  padding: 10px 24px;
+}
+
+.gallery-overlay__tour-btn {
+  margin-top: 16px;
+  margin-bottom: 4px;
+  font-size: 15px;
+  padding: 12px 32px;
+  letter-spacing: 0.5px;
+}
+
+/* ========================================
+   나가기 버튼
+======================================== */
+
+.gallery-exit-btn {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 30;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: rgba(255, 252, 247, 0.85);
+  color: var(--text-h);
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  transition: var(--transition);
+}
+
+.gallery-exit-btn:hover {
+  background: var(--surface);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* ========================================
+   배경음악 버튼
+======================================== */
+
+.gallery-bgm-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 30;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: rgba(255, 252, 247, 0.85);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  transition: var(--transition);
+}
+
+/* 미디어룸 — 오른쪽 하단, 재생버튼과 동일한 디자인 */
+.gallery-bgm-btn--media-alone,
+.gallery-bgm-btn--media-seated {
+  top: auto;
+  bottom: 32px;
+  right: 20px;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(255, 252, 247, 0.25);
+  background: rgba(41, 39, 36, 0.55);
+  color: rgba(255, 252, 247, 0.75);
+  backdrop-filter: blur(6px);
+}
+
+.gallery-bgm-btn:hover {
+  background: var(--surface);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* 재생 중 — 음파 아이콘에 미세한 맥동 효과 */
+.gallery-bgm-btn--playing {
+  color: var(--primary);
+  border-color: var(--border);
+}
+
+.gallery-bgm-btn--playing svg {
+  animation: bgm-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes bgm-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* ========================================
+   크로스헤어
+======================================== */
+
+.gallery-crosshair {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 30;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 252, 247, 0.7);
+  border: 1px solid rgba(41, 39, 36, 0.4);
+  pointer-events: none;
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease;
+}
+
+/* 작품 조준 시 크로스헤어 강조 */
+.gallery-crosshair--active {
+  transform: translate(-50%, -50%) scale(1.8);
+  background: rgba(166, 75, 60, 0.75);
+  border-color: rgba(166, 75, 60, 0.6);
+}
+
+/* ========================================
+   작품 감상 힌트
+======================================== */
+
+.gallery-interact-hint {
+  position: absolute;
+  bottom: 72px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  background: rgba(41, 39, 36, 0.6);
+  border-radius: 20px;
+  color: rgba(255, 252, 247, 0.9);
+  font-size: 13px;
+  backdrop-filter: blur(6px);
+  pointer-events: none;
+  animation: hint-fade-in 0.2s ease;
+}
+
+.gallery-interact-hint__key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  background: rgba(255, 252, 247, 0.2);
+  border: 1px solid rgba(255, 252, 247, 0.35);
+  border-radius: 4px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-style: normal;
+}
+
+.gallery-interact-hint__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.85;
+}
+
+@keyframes hint-fade-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* ========================================
+   하단 조작 가이드
+======================================== */
+
+.gallery-controls-guide {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 20px;
+  background: rgba(41, 39, 36, 0.5);
+  border-radius: 20px;
+  color: rgba(255, 252, 247, 0.75);
+  font-size: 12px;
+  letter-spacing: 0.3px;
+  backdrop-filter: blur(6px);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.gallery-controls-guide__sep {
+  opacity: 0.35;
+}
+
+/* ========================================
+   작품 감상 모달
+======================================== */
+
+.artwork-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(30, 27, 24, 0.82);
+  backdrop-filter: blur(8px);
+  animation: modal-bg-in 0.25s ease;
+  padding: 20px;
+}
+
+@keyframes modal-bg-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.artwork-modal__card {
+  position: relative;
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 48px 48px 48px 48px;
+  max-width: 860px;
+  width: 100%;
+  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.4);
+  animation: modal-card-in 0.28s ease;
+}
+
+@keyframes modal-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* 닫기 버튼 */
+.artwork-modal__close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.artwork-modal__close:hover {
+  background: var(--surface-soft);
+  color: var(--text-h);
+}
+
+/* 액자 영역 */
+.artwork-modal__frame {
+  flex-shrink: 0;
+  padding: 10px;
+  background: var(--surface-soft);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow);
+}
+
+.artwork-modal__frame-inner {
+  /* 원목 액자 느낌 */
+  padding: 10px;
+  background: #8b6845;
+  border-radius: 4px;
+}
+
+.artwork-modal__canvas {
+  display: block;
+  width: 240px;
+  height: 300px;
+  border-radius: 2px;
+}
+
+/* 드래그 핸들 — 모바일에서만 표시 */
+.artwork-modal__drag-handle {
+  display: none;
+}
+
+/* 작품 정보 */
+.artwork-modal__info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 8px;
+}
+
+/* 소형 인장 장식 */
+.artwork-modal__seal {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--heading);
+  font-size: 20px;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.artwork-modal__title {
+  font-family: var(--heading);
+  font-size: clamp(24px, 3vw, 32px);
+  color: var(--text-h);
+  font-weight: 400;
+  letter-spacing: 1px;
+  margin: 0;
+}
+
+.artwork-modal__title-en {
+  font-size: 13px;
+  color: var(--text-muted);
+  letter-spacing: 2px;
+  margin: 0;
+}
+
+.artwork-modal__divider {
+  width: 40px;
+  height: 1px;
+  background: var(--border);
+  margin: 4px 0;
+}
+
+.artwork-modal__desc {
+  font-size: 15px;
+  color: var(--text);
+  line-height: 1.9;
+  margin: 0;
+}
+
+.artwork-modal__hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: auto 0 0;
+  padding-top: 16px;
+}
+
+/* ========================================
+   모바일 조작 가이드 변형
+======================================== */
+
+.gallery-controls-guide--mobile {
+  left: auto;
+  right: 16px;
+  bottom: 68px;
+  transform: none;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  padding: 8px 12px;
+  font-size: 11px;
+  text-align: right;
+}
+
+/* ========================================
+   축하하기 버튼
+======================================== */
+
+.gallery-celebration-btn {
+  position: absolute;
+  bottom: 72px;
+  right: 20px;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  background: rgba(166, 75, 60, 0.85);
+  color: rgba(255, 252, 247, 0.95);
+  border: 1px solid rgba(166, 75, 60, 0.4);
+  border-radius: 20px;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  backdrop-filter: blur(6px);
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.gallery-celebration-btn:hover {
+  background: rgba(166, 75, 60, 1);
+}
+
+/* 모바일: 하단 nav 바로 위 왼쪽 — controls guide(우측)와 겹치지 않게 */
+@media (pointer: coarse) {
+  .gallery-celebration-btn {
+    bottom: 60px;
+    right: auto;
+    left: 16px;
+  }
+}
+
+/* ========================================
+   D패드 방향키 (모바일)
+======================================== */
+
+.gallery-dpad {
+  position: fixed;
+  bottom: 68px;
+  left: 16px;
+  z-index: 30;
+  display: grid;
+  grid-template-areas:
+    ". up ."
+    "left . right"
+    ". down .";
+  grid-template-columns: repeat(3, 34px);
+  grid-template-rows: repeat(3, 34px);
+  gap: 2px;
+  touch-action: none;
+  user-select: none;
+}
+
+.gallery-dpad__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(41, 39, 36, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 7px;
+  color: rgba(255, 252, 247, 0.85);
+  font-size: 12px;
+  cursor: pointer;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.1s;
+  backdrop-filter: blur(4px);
+}
+.gallery-dpad__btn:active {
+  background: rgba(41, 39, 36, 0.85);
+}
+
+.gallery-dpad__btn:nth-child(1) { grid-area: up; }
+.gallery-dpad__btn:nth-child(2) { grid-area: left; }
+.gallery-dpad__btn:nth-child(3) { grid-area: right; }
+.gallery-dpad__btn:nth-child(4) { grid-area: down; }
+
+/* ========================================
+   모바일 작품 순서 네비게이션
+======================================== */
+.gallery-artwork-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: rgba(41, 39, 36, 0.72);
+  backdrop-filter: blur(8px);
+  border-top: 1px solid rgba(255, 252, 247, 0.12);
+}
+
+.gallery-artwork-nav__btn {
+  color: rgba(255, 252, 247, 0.85);
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 252, 247, 0.2);
+  background: rgba(255, 252, 247, 0.06);
+  transition: background 0.2s;
+}
+
+.gallery-artwork-nav__btn:active {
+  background: rgba(255, 252, 247, 0.15);
+}
+
+.gallery-artwork-nav__count {
+  color: rgba(255, 252, 247, 0.6);
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+
+.gallery-artwork-nav--start {
+  justify-content: center;
+}
+
+.gallery-artwork-nav__start-btn {
+  color: rgba(255, 252, 247, 0.92);
+  font-size: 14px;
+  letter-spacing: 1.5px;
+  padding: 10px 28px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 252, 247, 0.35);
+  background: rgba(255, 252, 247, 0.1);
+  transition: background 0.2s;
+}
+
+.gallery-artwork-nav__start-btn:active {
+  background: rgba(255, 252, 247, 0.2);
+}
+
+.gallery-artwork-nav__close {
+  color: rgba(255, 252, 247, 0.4);
+  font-size: 12px;
+  padding: 6px 8px;
+  margin-left: 4px;
+}
+
+/* ========================================
+   반응형
+======================================== */
+
+@media (max-width: 640px) {
+  /* 모달: 아래서 올라오는 바텀시트 */
+  .artwork-modal {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  /* 카드 전체 — 고정 높이, 내부 overflow 차단 */
+  .artwork-modal__card {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0;
+    gap: 0;
+    width: 100%;
+    height: 90dvh;
+    max-height: 90dvh;
+    overflow: hidden; /* 카드 자체는 스크롤 안 됨 */
+    border-radius: 20px 20px 0 0;
+  }
+
+  /* 모달 열림 애니메이션 — 아래서 슬라이드 업 */
+  @keyframes modal-card-in {
+    from {
+      opacity: 0;
+      transform: translateY(60px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* 닫기 버튼 — 그림 영역 우상단 */
+  .artwork-modal__close {
+    top: 14px;
+    right: 14px;
+  }
+
+  /* 그림 영역 — flex-shrink: 0 으로 항상 고정 */
+  .artwork-modal__frame {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 32px 24px 20px;
+    background: var(--surface-soft);
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .artwork-modal__canvas {
+    width: 160px;
+    height: 200px;
+  }
+
+  /* 텍스트 영역 — flex: 1 + 스크롤 가능 */
+  .artwork-modal__info {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* iOS 부드러운 스크롤 */
+    overscroll-behavior: contain;
+    padding: 0 24px 40px;
+    gap: 10px;
+  }
+
+  /* 드래그 핸들 바 */
+  .artwork-modal__drag-handle {
+    display: block;
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border);
+    margin: 14px auto 18px;
+    flex-shrink: 0;
+  }
+
+  .artwork-modal__seal {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+
+  .artwork-modal__title {
+    font-size: 22px;
+  }
+
+  .artwork-modal__desc {
+    font-size: 14px;
+  }
+
+  .artwork-modal__hint {
+    font-size: 11px;
+  }
+
+  .gallery-controls-guide {
+    font-size: 11px;
+    gap: 7px;
+    padding: 7px 14px;
+  }
+
+  .gallery-overlay__inner {
+    padding: 28px 24px;
+    max-width: 300px;
+  }
+}
+
+/* ========================================
+   모바일 가로 모드 (landscape)
+   세로 높이가 짧아 바텀시트 대신 PC팝업 축소 버전으로 표시
+======================================== */
+
+@media (orientation: landscape) and (max-height: 500px) {
+  /* 모달: 중앙 정렬 (바텀시트 해제) */
+  .artwork-modal {
+    align-items: center;
+    padding: 12px;
+  }
+
+  /* 카드: 가로 2단 레이아웃 (PC 팝업 축소) */
+  .artwork-modal__card {
+    flex-direction: row;
+    align-items: flex-start;
+    width: auto;
+    max-width: 580px;
+    height: auto;
+    max-height: 88dvh;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    gap: 20px;
+  }
+
+  @keyframes modal-card-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.97);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* 그림 영역: 세로로 좁으니 캔버스 작게 */
+  .artwork-modal__frame {
+    flex-shrink: 0;
+    padding: 7px;
+    background: var(--surface-soft);
+    border-bottom: none;
+    align-self: flex-start;
+  }
+
+  .artwork-modal__frame-inner {
+    padding: 6px;
+  }
+
+  .artwork-modal__canvas {
+    width: 110px;
+    height: 138px;
+  }
+
+  /* 텍스트 영역: 넘치면 스크롤 */
+  .artwork-modal__info {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0;
+    gap: 8px;
+  }
+
+  /* 드래그 핸들 숨김 (가로 모드에선 불필요) */
+  .artwork-modal__drag-handle {
+    display: none;
+  }
+
+  .artwork-modal__seal {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+
+  .artwork-modal__title {
+    font-size: 18px;
+  }
+
+  .artwork-modal__title-en {
+    font-size: 11px;
+  }
+
+  .artwork-modal__desc {
+    font-size: 12px;
+    line-height: 1.7;
+  }
+
+  .artwork-modal__hint {
+    font-size: 10px;
+    padding-top: 8px;
+  }
+
+  /* 닫기 버튼 위치 */
+  .artwork-modal__close {
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    font-size: 13px;
+  }
+}
