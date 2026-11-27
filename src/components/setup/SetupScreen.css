@@ -223,6 +223,20 @@
   align-items: center;
   justify-content: center;
 }
+.setup-grid__slot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(166, 75, 60, 0.82);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 600;
+  padding: 2px 5px;
+  border-radius: 3px;
+  letter-spacing: 0.2px;
+  line-height: 1.4;
+  pointer-events: none;
+}
 .setup-grid__actions {
   position: absolute;
   bottom: 0;

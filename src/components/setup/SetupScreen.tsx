@@ -5,22 +5,38 @@
 
 import { useState, useRef, useCallback } from "react";
 import type { ArtworkItem, ExhibitionData } from "../../types";
-import { MAX_ARTWORKS } from "../../utils/slotMapper";
+import { MAX_ARTWORKS, SLOT_ORDER } from "../../utils/slotMapper";
 import "./SetupScreen.css";
 
 interface Props {
   onComplete: (data: ExhibitionData) => void;
+  initialData?: ExhibitionData;
 }
+
+const SLOT_LABELS: Record<string, string> = {
+  "back-main":    "뒷벽 메인",
+  "left-7":       "왼쪽 가운데",
+  "right-7":      "오른쪽 가운데",
+  "front-2":      "앞벽 중앙",
+  "left-1":       "왼쪽",
+  "right-1":      "오른쪽",
+  "left-n5":      "왼쪽 뒤",
+  "right-n5":     "오른쪽 뒤",
+  "front-1":      "앞벽 좌",
+  "front-3":      "앞벽 우",
+  "back-left-1":  "뒷벽 좌측",
+  "back-right-1": "뒷벽 우측",
+};
 
 function generateId() {
   return Math.random().toString(36).slice(2, 10);
 }
 
-export default function SetupScreen({ onComplete }: Props) {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [artworks, setArtworks] = useState<ArtworkItem[]>([]);
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+export default function SetupScreen({ onComplete, initialData }: Props) {
+  const [title, setTitle] = useState(initialData?.title ?? "");
+  const [description, setDescription] = useState(initialData?.description ?? "");
+  const [artworks, setArtworks] = useState<ArtworkItem[]>(initialData?.artworks ?? []);
+  const [selectedId, setSelectedId] = useState<string | null>(initialData?.artworks[0]?.id ?? null);
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -219,6 +235,7 @@ export default function SetupScreen({ onComplete }: Props) {
                 >
                   <img src={artwork.imageUrl} alt={artwork.title} className="setup-grid__img" />
                   <span className="setup-grid__num">{idx + 1}</span>
+                  <span className="setup-grid__slot">{SLOT_LABELS[SLOT_ORDER[idx]]}</span>
                   <div className="setup-grid__actions">
                     <button
                       className="setup-grid__btn"

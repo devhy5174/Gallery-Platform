@@ -14,24 +14,31 @@ import type { ArtworkData } from "./artworkData";
 interface SlotConfig {
   position: [number, number, number];
   rotation: [number, number, number];
-  frameW: number;
-  frameH: number;
+  maxW: number;
+  maxH: number;
 }
 
 const SLOT_CONFIGS: Record<string, SlotConfig> = {
-  "left-7":       { position: [-5.93, 2.1, 7],  rotation: [0,  Math.PI / 2, 0], frameW: 1.1, frameH: 1.4 },
-  "left-1":       { position: [-5.93, 2.1, 1],  rotation: [0,  Math.PI / 2, 0], frameW: 1.1, frameH: 1.4 },
-  "left-n5":      { position: [-5.93, 2.1, -5], rotation: [0,  Math.PI / 2, 0], frameW: 1.1, frameH: 1.4 },
-  "right-7":      { position: [ 5.93, 2.1, 7],  rotation: [0, -Math.PI / 2, 0], frameW: 1.1, frameH: 1.4 },
-  "right-1":      { position: [ 5.93, 2.1, 1],  rotation: [0, -Math.PI / 2, 0], frameW: 1.1, frameH: 1.4 },
-  "right-n5":     { position: [ 5.93, 2.1, -5], rotation: [0, -Math.PI / 2, 0], frameW: 1.1, frameH: 1.4 },
-  "front-1":      { position: [-3.5,  2.1, 12.9], rotation: [0, Math.PI, 0],    frameW: 1.1, frameH: 1.4 },
-  "front-2":      { position: [ 0,    2.1, 12.9], rotation: [0, Math.PI, 0],    frameW: 1.1, frameH: 1.4 },
-  "front-3":      { position: [ 3.5,  2.1, 12.9], rotation: [0, Math.PI, 0],    frameW: 1.1, frameH: 1.4 },
-  "back-left-1":  { position: [-3.8,  1.85, -12.9], rotation: [0, 0, 0],        frameW: 1.1, frameH: 1.4 },
-  "back-right-1": { position: [ 3.8,  1.85, -12.9], rotation: [0, 0, 0],        frameW: 1.1, frameH: 1.4 },
-  "back-main":    { position: [ 0,    1.5,  -12.9], rotation: [0, 0, 0],        frameW: 2.0, frameH: 2.6 },
+  "left-7":       { position: [-5.93, 2.1, 7],     rotation: [0,  Math.PI / 2, 0], maxW: 1.4, maxH: 1.4 },
+  "left-1":       { position: [-5.93, 2.1, 1],     rotation: [0,  Math.PI / 2, 0], maxW: 1.4, maxH: 1.4 },
+  "left-n5":      { position: [-5.93, 2.1, -5],    rotation: [0,  Math.PI / 2, 0], maxW: 1.4, maxH: 1.4 },
+  "right-7":      { position: [ 5.93, 2.1, 7],     rotation: [0, -Math.PI / 2, 0], maxW: 1.4, maxH: 1.4 },
+  "right-1":      { position: [ 5.93, 2.1, 1],     rotation: [0, -Math.PI / 2, 0], maxW: 1.4, maxH: 1.4 },
+  "right-n5":     { position: [ 5.93, 2.1, -5],    rotation: [0, -Math.PI / 2, 0], maxW: 1.4, maxH: 1.4 },
+  "front-1":      { position: [-3.5,  2.1, 12.9],  rotation: [0, Math.PI, 0],      maxW: 1.4, maxH: 1.4 },
+  "front-2":      { position: [ 0,    2.1, 12.9],  rotation: [0, Math.PI, 0],      maxW: 1.4, maxH: 1.4 },
+  "front-3":      { position: [ 3.5,  2.1, 12.9],  rotation: [0, Math.PI, 0],      maxW: 1.4, maxH: 1.4 },
+  "back-left-1":  { position: [-3.8,  1.85, -12.9], rotation: [0, 0, 0],           maxW: 1.4, maxH: 1.4 },
+  "back-right-1": { position: [ 3.8,  1.85, -12.9], rotation: [0, 0, 0],           maxW: 1.4, maxH: 1.4 },
+  "back-main":    { position: [ 0,    1.5,  -12.9], rotation: [0, 0, 0],           maxW: 2.4, maxH: 2.6 },
 };
+
+function computeFrameSize(ratio: number, maxW: number, maxH: number): [number, number] {
+  if (ratio >= maxW / maxH) {
+    return [maxW, maxW / ratio];
+  }
+  return [maxH * ratio, maxH];
+}
 
 // ─── 단일 액자 ───────────────────────────────────────────────────
 
@@ -39,23 +46,34 @@ function ArtFrame({ artwork }: { artwork: ArtworkData }) {
   const slot = SLOT_CONFIGS[artwork.id];
   if (!slot) return null;
 
-  const { position, rotation, frameW, frameH } = slot;
+  const { position, rotation, maxW, maxH } = slot;
   const frameT = 0.055;
   const frameD = 0.07;
 
   const canvasTex = useMemo(() => createArtTexture(artwork.artType), [artwork.artType]);
   const [texture, setTexture] = useState<THREE.Texture>(canvasTex);
+  const [frameW, setFrameW] = useState(maxW);
+  const [frameH, setFrameH] = useState(maxH);
 
   useEffect(() => {
     if (!artwork.imageUrl) { setTexture(canvasTex); return; }
     const loader = new THREE.TextureLoader();
     loader.load(
       artwork.imageUrl,
-      (tex) => { tex.colorSpace = THREE.SRGBColorSpace; setTexture(tex); },
+      (tex) => {
+        tex.colorSpace = THREE.SRGBColorSpace;
+        setTexture(tex);
+        const { naturalWidth: w, naturalHeight: h } = tex.image as HTMLImageElement;
+        if (w && h) {
+          const [fw, fh] = computeFrameSize(w / h, maxW, maxH);
+          setFrameW(fw);
+          setFrameH(fh);
+        }
+      },
       undefined,
       () => setTexture(canvasTex),
     );
-  }, [artwork.imageUrl, canvasTex]);
+  }, [artwork.imageUrl, canvasTex, maxW, maxH]);
 
   return (
     <group position={position} rotation={rotation}>

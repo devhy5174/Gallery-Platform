@@ -1,4 +1,4 @@
-export type AppScreen = "setup" | "gallery" | "media-room";
+export type AppScreen = "setup" | "entry" | "gallery" | "media-room";
 
 export interface ArtworkItem {
   id: string;

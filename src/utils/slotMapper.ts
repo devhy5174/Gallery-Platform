@@ -14,7 +14,7 @@ export interface Viewpoint {
 }
 
 /** 배치 순서: 시각적으로 가장 눈에 띄는 슬롯부터 */
-const SLOT_ORDER = [
+export const SLOT_ORDER = [
   "back-main",    // 뒷벽 메인 (대형, 가장 눈에 띄는)
   "left-7",       // 왼쪽 가운데
   "right-7",      // 오른쪽 가운데
