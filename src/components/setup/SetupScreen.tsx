@@ -203,35 +203,49 @@ export default function SetupScreen({ onComplete, initialData }: Props) {
             />
           </div>
 
-          {/* 선택된 작품 편집 */}
-          {selectedArtwork && (
-            <div className="setup-artwork-edit">
-              <h3 className="setup-section-title setup-section-title--sm">작품 정보 편집</h3>
-              <img
-                className="setup-artwork-preview"
-                src={selectedArtwork.imageUrl}
-                alt={selectedArtwork.title}
-              />
-              <div className="setup-field">
-                <label className="setup-label">작품 제목</label>
-                <input
-                  className="setup-input"
-                  type="text"
-                  value={selectedArtwork.title}
-                  onChange={(e) => updateArtwork(selectedArtwork.id, { title: e.target.value })}
-                  maxLength={60}
-                />
-              </div>
-              <div className="setup-field">
-                <label className="setup-label">작품 설명</label>
-                <textarea
-                  className="setup-textarea"
-                  value={selectedArtwork.description}
-                  onChange={(e) => updateArtwork(selectedArtwork.id, { description: e.target.value })}
-                  rows={3}
-                  maxLength={200}
-                />
-              </div>
+          {/* 전체 작품 정보 편집 */}
+          {artworks.length > 0 && (
+            <div className="setup-artwork-list">
+              <h3 className="setup-section-title setup-section-title--sm">
+                작품 정보 <span className="setup-artwork-list__count">{artworks.length}점</span>
+              </h3>
+              {artworks.map((artwork, idx) => (
+                <div
+                  key={artwork.id}
+                  className={`setup-artwork-item${selectedId === artwork.id ? " setup-artwork-item--active" : ""}`}
+                  onClick={() => setSelectedId(artwork.id)}
+                >
+                  <div className="setup-artwork-item__header">
+                    <img
+                      className="setup-artwork-item__thumb"
+                      src={artwork.imageUrl}
+                      alt={artwork.title}
+                    />
+                    <div className="setup-artwork-item__meta">
+                      <span className="setup-artwork-item__num">{idx + 1}</span>
+                      <span className="setup-artwork-item__slot">{SLOT_LABELS[SLOT_ORDER[idx]]}</span>
+                    </div>
+                  </div>
+                  <input
+                    className="setup-input setup-input--sm"
+                    type="text"
+                    placeholder="작품 제목"
+                    value={artwork.title}
+                    onChange={(e) => updateArtwork(artwork.id, { title: e.target.value })}
+                    onClick={(e) => e.stopPropagation()}
+                    maxLength={60}
+                  />
+                  <textarea
+                    className="setup-textarea setup-textarea--sm"
+                    placeholder="작품 설명 (선택)"
+                    value={artwork.description}
+                    onChange={(e) => updateArtwork(artwork.id, { description: e.target.value })}
+                    onClick={(e) => e.stopPropagation()}
+                    rows={2}
+                    maxLength={200}
+                  />
+                </div>
+              ))}
             </div>
           )}
         </section>
