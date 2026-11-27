@@ -6,7 +6,7 @@
 
 import type { ExhibitionData, ArtworkItem } from "../types";
 
-export const DEV_MODE = true;
+export const DEV_MODE = false;
 
 const COLORS = [
   "#7c6e5b", "#a64b3c", "#4a7c6e", "#76563e",
