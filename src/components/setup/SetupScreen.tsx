@@ -3,7 +3,7 @@
  * 전시회 설정 화면 — 제목/소개 입력 + 사진 업로드 + 작품 메타데이터 편집
  */
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import type { ArtworkItem, ExhibitionData } from "../../types";
 import { MAX_ARTWORKS, SLOT_ORDER } from "../../utils/slotMapper";
 import "./SetupScreen.css";
@@ -38,7 +38,9 @@ export default function SetupScreen({ onComplete, initialData }: Props) {
   const [artworks, setArtworks] = useState<ArtworkItem[]>(initialData?.artworks ?? []);
   const [selectedId, setSelectedId] = useState<string | null>(initialData?.artworks[0]?.id ?? null);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [dragOverId, setDragOverId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const dragIdRef = useRef<string | null>(null);
 
   const selectedArtwork = artworks.find((a) => a.id === selectedId) ?? null;
 
@@ -78,19 +80,65 @@ export default function SetupScreen({ onComplete, initialData }: Props) {
     addFiles(e.dataTransfer.files);
   };
 
-  // ── 순서 변경 ────────────────────────────────────────────────
+  // ── 드래그 순서 변경 (PC + 모바일 공용) ─────────────────────
 
-  const moveArtwork = (id: string, dir: -1 | 1) => {
+  const reorderArtwork = (fromId: string, toId: string) => {
+    if (fromId === toId) return;
     setArtworks((prev) => {
-      const idx = prev.findIndex((a) => a.id === id);
-      if (idx < 0) return prev;
-      const next = idx + dir;
-      if (next < 0 || next >= prev.length) return prev;
       const arr = [...prev];
-      [arr[idx], arr[next]] = [arr[next], arr[idx]];
+      const fi = arr.findIndex((a) => a.id === fromId);
+      const ti = arr.findIndex((a) => a.id === toId);
+      if (fi < 0 || ti < 0) return prev;
+      const [item] = arr.splice(fi, 1);
+      arr.splice(ti, 0, item);
       return arr;
     });
   };
+
+  // PC drag-and-drop
+  const onDragStart = (id: string) => { dragIdRef.current = id; };
+  const onDragOver = (e: React.DragEvent, id: string) => {
+    e.preventDefault();
+    setDragOverId(id);
+  };
+  const onDrop = (id: string) => {
+    if (dragIdRef.current) reorderArtwork(dragIdRef.current, id);
+    dragIdRef.current = null;
+    setDragOverId(null);
+  };
+  const onDragEnd = () => { dragIdRef.current = null; setDragOverId(null); };
+
+  // 모바일 touch
+  const onTouchStart = (_e: React.TouchEvent, id: string) => {
+    dragIdRef.current = id;
+  };
+  const onTouchMove = (e: React.TouchEvent) => {
+    if (!dragIdRef.current) return;
+    const touch = e.touches[0];
+    const el = document.elementFromPoint(touch.clientX, touch.clientY);
+    const target = el?.closest("[data-artwork-id]") as HTMLElement | null;
+    setDragOverId(target?.dataset.artworkId ?? null);
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (!dragIdRef.current) return;
+    const touch = e.changedTouches[0];
+    const el = document.elementFromPoint(touch.clientX, touch.clientY);
+    const target = el?.closest("[data-artwork-id]") as HTMLElement | null;
+    const toId = target?.dataset.artworkId;
+    if (toId) reorderArtwork(dragIdRef.current, toId);
+    dragIdRef.current = null;
+    setDragOverId(null);
+  };
+
+  // 모바일 touch-action: none 등록 (passive 방지)
+  const gridRef = useRef<HTMLUListElement>(null);
+  useEffect(() => {
+    const el = gridRef.current;
+    if (!el) return;
+    const prevent = (e: TouchEvent) => { if (dragIdRef.current) e.preventDefault(); };
+    el.addEventListener("touchmove", prevent, { passive: false });
+    return () => el.removeEventListener("touchmove", prevent);
+  }, []);
 
   // ── 삭제 ────────────────────────────────────────────────────
 
@@ -226,11 +274,24 @@ export default function SetupScreen({ onComplete, initialData }: Props) {
 
           {/* 업로드된 사진 그리드 */}
           {artworks.length > 0 && (
-            <ul className="setup-grid">
+            <ul className="setup-grid" ref={gridRef}>
               {artworks.map((artwork, idx) => (
                 <li
                   key={artwork.id}
-                  className={`setup-grid__item${selectedId === artwork.id ? " setup-grid__item--selected" : ""}`}
+                  data-artwork-id={artwork.id}
+                  draggable
+                  onDragStart={() => onDragStart(artwork.id)}
+                  onDragOver={(e) => onDragOver(e, artwork.id)}
+                  onDrop={() => onDrop(artwork.id)}
+                  onDragEnd={onDragEnd}
+                  onTouchStart={(e) => onTouchStart(e, artwork.id)}
+                  onTouchMove={onTouchMove}
+                  onTouchEnd={onTouchEnd}
+                  className={[
+                    "setup-grid__item",
+                    selectedId === artwork.id ? "setup-grid__item--selected" : "",
+                    dragOverId === artwork.id ? "setup-grid__item--drag-over" : "",
+                  ].filter(Boolean).join(" ")}
                   onClick={() => setSelectedId(artwork.id)}
                 >
                   <img src={artwork.imageUrl} alt={artwork.title} className="setup-grid__img" />
@@ -238,22 +299,10 @@ export default function SetupScreen({ onComplete, initialData }: Props) {
                   <span className="setup-grid__slot">{SLOT_LABELS[SLOT_ORDER[idx]]}</span>
                   <div className="setup-grid__actions">
                     <button
-                      className="setup-grid__btn"
-                      onClick={(e) => { e.stopPropagation(); moveArtwork(artwork.id, -1); }}
-                      disabled={idx === 0}
-                      title="앞으로"
-                    >←</button>
-                    <button
                       className="setup-grid__btn setup-grid__btn--del"
                       onClick={(e) => { e.stopPropagation(); removeArtwork(artwork.id); }}
                       title="삭제"
                     >✕</button>
-                    <button
-                      className="setup-grid__btn"
-                      onClick={(e) => { e.stopPropagation(); moveArtwork(artwork.id, 1); }}
-                      disabled={idx === artworks.length - 1}
-                      title="뒤로"
-                    >→</button>
                   </div>
                 </li>
               ))}

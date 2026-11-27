@@ -147,6 +147,26 @@
   opacity: 0.75;
 }
 
+/* 전시 개설 버튼 */
+.entry__checkout-btn {
+  width: 100%;
+  max-width: 320px;
+  padding: 14px 24px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: -0.2px;
+  transition: background 0.15s, transform 0.1s;
+  box-shadow: 0 4px 16px rgba(166, 75, 60, 0.35);
+}
+.entry__checkout-btn:hover { background: var(--accent-hover); }
+.entry__checkout-btn:active { transform: scale(0.97); }
+
 /* 하단 힌트 */
 .entry__hint {
   font-size: 13px;

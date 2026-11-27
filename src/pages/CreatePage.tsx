@@ -1,81 +1,93 @@
 /**
  * CreatePage  /
- * 전시 제작 페이지 — SetupScreen 래핑 + Supabase 저장
+ * 전시 제작 → 미리보기 → 개설하기(/checkout)
  */
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import SetupScreen from "../components/setup/SetupScreen";
-import { saveExhibition } from "../lib/api";
-import type { ExhibitionData } from "../types";
+import EntryScreen from "../components/entry/EntryScreen";
+import Gallery from "../components/gallery/Gallery";
+import MediaRoom from "../components/mediaroom/MediaRoom";
+import GalleryBgm from "../components/gallery/GalleryBgm";
+import { assignSlots } from "../utils/slotMapper";
+import type { AppScreen, ExhibitionData } from "../types";
 
 interface LocationState {
   initialData?: ExhibitionData;
   exhibitionId?: string;
 }
 
+type LocalScreen = Extract<AppScreen, "setup" | "entry" | "gallery" | "media-room">;
+
 export default function CreatePage() {
   const navigate = useNavigate();
   const location = useLocation();
   const state = (location.state ?? {}) as LocationState;
 
-  const [saving, setSaving] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
+  const [localExhibition, setLocalExhibition] = useState<ExhibitionData | null>(
+    state.initialData ?? null,
+  );
+  const [screen, setScreen] = useState<LocalScreen>(
+    state.initialData ? "entry" : "setup",
+  );
+  const [mediaSeated, setMediaSeated] = useState(false);
 
-  const handleComplete = async (data: ExhibitionData) => {
-    setSaving(true);
-    setSaveError(null);
-    try {
-      const id = await saveExhibition(data, state.exhibitionId);
-      navigate(`/gallery/${id}`);
-    } catch (e) {
-      console.error(e);
-      setSaveError("저장 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
-      setSaving(false);
-    }
+  const galleryArtworks = useMemo(
+    () => (localExhibition ? assignSlots(localExhibition.artworks) : []),
+    [localExhibition],
+  );
+
+  const handleSetupComplete = (data: ExhibitionData) => {
+    setLocalExhibition(data);
+    setScreen("entry");
+  };
+
+  const handleCheckout = () => {
+    navigate("/checkout", {
+      state: { exhibition: localExhibition, exhibitionId: state.exhibitionId },
+    });
   };
 
   return (
-    <>
-      <SetupScreen
-        onComplete={handleComplete}
-        initialData={state.initialData}
-      />
-
-      {saving && (
-        <div style={{
-          position: "fixed", inset: 0, zIndex: 9999,
-          background: "rgba(247,243,235,0.88)",
-          display: "flex", flexDirection: "column",
-          alignItems: "center", justifyContent: "center",
-          gap: 16,
-          backdropFilter: "blur(4px)",
-        }}>
-          <div style={{
-            width: 40, height: 40, borderRadius: "50%",
-            border: "3px solid #ddd0bd",
-            borderTopColor: "#76563e",
-            animation: "spin 0.8s linear infinite",
-          }} />
-          <p style={{ fontFamily: "var(--sans)", color: "var(--text-h)", fontSize: 15 }}>
-            전시를 저장하는 중입니다…
-          </p>
-          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-        </div>
+    <div className="app">
+      {screen === "setup" && (
+        <SetupScreen
+          onComplete={handleSetupComplete}
+          initialData={localExhibition ?? undefined}
+        />
       )}
 
-      {saveError && (
-        <div style={{
-          position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)",
-          background: "#a64b3c", color: "#fff",
-          padding: "12px 24px", borderRadius: 8,
-          fontFamily: "var(--sans)", fontSize: 14,
-          boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
-          zIndex: 9999,
-        }}>
-          {saveError}
-        </div>
+      {screen === "entry" && localExhibition && (
+        <EntryScreen
+          exhibition={localExhibition}
+          onEnterGallery={() => setScreen("gallery")}
+          onEnterMediaRoom={() => setScreen("media-room")}
+          onEdit={() => setScreen("setup")}
+          onCheckout={handleCheckout}
+        />
       )}
-    </>
+
+      {screen === "gallery" && localExhibition && (
+        <Gallery
+          artworks={galleryArtworks}
+          exhibitionTitle={localExhibition.title}
+          onExit={() => setScreen("entry")}
+          onEnterMediaRoom={() => setScreen("media-room")}
+        />
+      )}
+
+      {screen === "media-room" && localExhibition && (
+        <MediaRoom
+          artworks={galleryArtworks}
+          onExit={() => { setMediaSeated(false); setScreen("gallery"); }}
+          onSeatChange={setMediaSeated}
+        />
+      )}
+
+      {(screen === "gallery" || screen === "media-room") && (
+        <GalleryBgm bottom={screen === "media-room"} mediaSeated={mediaSeated} />
+      )}
+    </div>
   );
 }

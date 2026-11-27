@@ -6,9 +6,10 @@ interface Props {
   onEnterGallery: () => void;
   onEnterMediaRoom: () => void;
   onEdit?: () => void;
+  onCheckout?: () => void;
 }
 
-export default function EntryScreen({ exhibition, onEnterGallery, onEnterMediaRoom, onEdit }: Props) {
+export default function EntryScreen({ exhibition, onEnterGallery, onEnterMediaRoom, onEdit, onCheckout }: Props) {
   return (
     <div className="entry">
       {onEdit && (
@@ -41,6 +42,12 @@ export default function EntryScreen({ exhibition, onEnterGallery, onEnterMediaRo
         </div>
 
         <p className="entry__hint">작품 {exhibition.artworks.length}점 전시 중</p>
+
+        {onCheckout && (
+          <button className="entry__checkout-btn" onClick={onCheckout}>
+            전시 개설하기 — ₩100,000
+          </button>
+        )}
       </div>
     </div>
   );

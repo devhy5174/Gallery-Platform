@@ -1,0 +1,158 @@
+/* ========================================
+   SIGNUP SCREEN
+======================================== */
+
+.signup {
+  min-height: 100dvh;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+}
+
+.signup__inner {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+/* 완료 아이콘 */
+.signup__icon {
+  width: 56px;
+  height: 56px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+/* 텍스트 */
+.signup__text {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.signup__title {
+  font-family: var(--heading);
+  font-size: 22px;
+  color: var(--text-h);
+  margin: 0;
+}
+
+.signup__desc {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.signup__divider {
+  width: 100%;
+  height: 1px;
+  background: var(--border-light);
+}
+
+/* 폼 */
+.signup__form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.signup__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.signup__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-h);
+  letter-spacing: -0.1px;
+}
+
+.signup__input {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--sans);
+  font-size: 15px;
+  color: var(--text-h);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  box-sizing: border-box;
+}
+.signup__input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(118, 86, 62, 0.12);
+}
+.signup__input::placeholder { color: var(--text-muted); }
+
+/* 에러 */
+.signup__error {
+  font-size: 13px;
+  color: var(--accent);
+  margin: 0;
+  padding: 10px 14px;
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius-sm);
+}
+
+/* 제출 버튼 */
+.signup__btn {
+  width: 100%;
+  padding: 15px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--sans);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: -0.2px;
+  transition: background 0.15s, transform 0.1s;
+  box-shadow: 0 4px 16px rgba(118, 86, 62, 0.3);
+  margin-top: 4px;
+}
+.signup__btn:hover { background: var(--primary-hover); }
+.signup__btn:active { transform: scale(0.98); }
+
+/* 로그인 링크 */
+.signup__login-hint {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.signup__login-link {
+  background: none;
+  border: none;
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--primary);
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+/* 모바일 */
+@media (max-width: 480px) {
+  .signup__input { font-size: 16px; } /* iOS 자동 확대 방지 */
+  .signup__btn { font-size: 15px; padding: 14px; }
+}

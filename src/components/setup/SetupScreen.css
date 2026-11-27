@@ -237,13 +237,23 @@
   line-height: 1.4;
   pointer-events: none;
 }
+.setup-grid__item {
+  cursor: grab;
+  touch-action: none;
+}
+.setup-grid__item:active { cursor: grabbing; }
+.setup-grid__item--drag-over {
+  outline: 2px dashed var(--primary);
+  outline-offset: -2px;
+  opacity: 0.7;
+}
 .setup-grid__actions {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   background: rgba(41, 39, 36, 0.7);
   opacity: 0;
   transition: opacity 0.15s;
